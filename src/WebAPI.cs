@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace WebClientCA
+namespace Jovemnf.WebAPI
 {
     public class WebAPI : IDisposable
     {
