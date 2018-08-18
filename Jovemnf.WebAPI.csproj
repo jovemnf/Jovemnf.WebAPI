@@ -2,6 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>Jovemnf.WebAPI</PackageId>
+    <Version>0.0.1</Version>
+    <Authors>Jovemnf</Authors>
+    <Company>Jovemnf</Company>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Title>Pacode .net core para usar os verbos HTTP. </Title>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/jovemnf/Jovemnf.WebAPI.git</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
