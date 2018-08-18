@@ -1,0 +1,11 @@
+<package>
+    <metadata>
+        <id>Jovemnf.WebAPI</id>
+        <version>0.0.1</version>
+        <authors>Wallace Silva</authors>
+        <description>Lib para user os verbos HTTP</description>
+        <language>pt-BR</language>
+        <RepositoryURL>https://github.com/jovemnf/Jovemnf.WebAPI.git</RepositoryURL>
+    </metadata>
+    <file src="bin\Release\netstandard2.0\Jovemnf.WebAPI.dll" target="lib" />
+</package>
