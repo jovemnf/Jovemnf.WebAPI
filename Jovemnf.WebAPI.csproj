@@ -10,7 +10,7 @@
     <Title>Pacote .net core para usar os verbos HTTP. </Title>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/jovemnf/Jovemnf.WebAPI.git</RepositoryUrl>
-    <DocumentationMarkdownURL>https://github.com/jovemnf/Jovemnf.WebAPI/blob/master/README.md</DocumentationMarkdownURL>
+    <PackageProjectUrl>https://github.com/jovemnf/Jovemnf.WebAPI/blob/master/README.md</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
