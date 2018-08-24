@@ -98,6 +98,40 @@ namespace Jovemnf.WebAPI
             }
         }
 
+        public async void Send()
+        {
+            try
+            {
+                await WebRequest.GetResponseAsync();
+            }
+            catch (WebException e)
+            {
+                throw WebAPI.CheckException(e);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        public async Task<object> SendAndGet()
+        {
+            try
+            {
+                var response = await WebRequest.GetResponseAsync();
+                StreamReader reader = new StreamReader(response.GetResponseStream());
+                return JsonConvert.DeserializeObject<object>(reader.ReadToEnd());
+            }
+            catch (WebException e)
+            {
+                throw WebAPI.CheckException(e);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
         public HttpWebRequest WebRequest
         {
             get { return web; }
@@ -132,7 +166,28 @@ namespace Jovemnf.WebAPI
         {
             try
             {
-                string output = JsonConvert.SerializeObject(dados);
+                processJson(JsonConvert.SerializeObject(dados));
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        public void SetJson(object dados)
+        {
+            try
+            {
+                processJson(JsonConvert.SerializeObject(dados));
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        private void processJson (string output) {
+            try {
                 byte[] data = Encoding.UTF8.GetBytes(output);
 
                 web.ContentType = "application/json";
@@ -141,12 +196,9 @@ namespace Jovemnf.WebAPI
                 Stream response = web.GetRequestStream();
                 response.Write(data, 0, data.Length);
                 response.Close();
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 throw e;
             }
-
         }
 
         private object Parse(Dictionary<string, object> dados, string key)
