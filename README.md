@@ -143,3 +143,19 @@ namespace TesteWebAPI
     }
 }
 ```
+
+
+## Using header
+
+```csharp
+string url = "https://jsonplaceholder.typicode.com/posts";
+using (WebAPI web = new WebAPI(url, 5000, WebAPI.MethodRequest.POST))
+{
+    try {
+        web.SetHeader("Bearer", "JWT 563563563563563563564564");
+        web.SetJson(post);
+    } catch (Exception e) {
+        Console.WriteLine(e);
+    }
+}
+```

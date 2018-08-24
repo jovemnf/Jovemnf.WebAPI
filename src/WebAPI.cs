@@ -177,29 +177,9 @@ namespace Jovemnf.WebAPI
 
         }
 
-        public void SetJson(Dictionary<string, object> dados)
-        {
-            try
-            {
-                processJson(JsonConvert.SerializeObject(dados));
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-        }
+        public void SetJson(Dictionary<string, object> dados) => processJson(JsonConvert.SerializeObject(dados));
 
-        public void SetJson(object dados)
-        {
-            try
-            {
-                processJson(JsonConvert.SerializeObject(dados));
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-        }
+        public void SetJson(object dados) => processJson(JsonConvert.SerializeObject(dados));
 
         private void processJson (string output) {
             try {
@@ -249,6 +229,8 @@ namespace Jovemnf.WebAPI
                 throw e;
             }
         }
+
+        public void SetHeader(string index, string value) => web.Headers.Add(index, value);
 
         public string SetDataPost(Dictionary<string, string> dados)
         {
