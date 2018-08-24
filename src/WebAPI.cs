@@ -114,13 +114,28 @@ namespace Jovemnf.WebAPI
             }
         }
 
-        public async Task<T> SendAndGet<T>()
+        public async Task<T> Send<T>()
+        {
+            try
+            {
+                return (T) JsonConvert.DeserializeObject<T>(await SendAndGetString());
+            }
+            catch (WebException e)
+            {
+                throw WebAPI.CheckException(e);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        public async Task<string> SendAndGetString()
         {
             try
             {
                 var response = await WebRequest.GetResponseAsync();
-                StreamReader reader = new StreamReader(response.GetResponseStream());
-                return (T) JsonConvert.DeserializeObject<T>(reader.ReadToEnd());
+                return new StreamReader(response.GetResponseStream()).ReadToEnd();
             }
             catch (WebException e)
             {
