@@ -93,7 +93,7 @@ namespace TesteWebAPI
 
 ### POST
 
-Utilizando a lib via POST
+Utilizando a lib via POST e aguardando resultado
 
 ```csharp
 using System;
@@ -144,6 +144,51 @@ namespace TesteWebAPI
 }
 ```
 
+Utilizando a lib via POST sem nenhum resultado
+
+```csharp
+using System;
+using Jovemnf.WebAPI;
+
+namespace TesteWebAPI
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var post = new Post
+            {
+                userId = 1,
+                title = "titulo 1",
+                body = "body 1"
+            };
+
+            Exec(post);
+            Console.Read();
+        }
+
+        private static async void Exec(Post post) {
+            string url = "https://jsonplaceholder.typicode.com/posts";
+            using (WebAPI web = new WebAPI(url, 5000, WebAPI.MethodRequest.POST))
+            {
+                try {
+                    web.SetJson(post);
+                    await web.Send();
+                } catch (Exception e) {
+                    Console.WriteLine(e);
+                }
+            }
+        }
+    }
+
+    class Post {
+        public int userId { get; set; }
+        public int id { get; set; }
+        public string title { get; set; }
+        public string body { get; set; }
+    }
+}
+```
 
 ## Using header
 

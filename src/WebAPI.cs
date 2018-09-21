@@ -98,7 +98,7 @@ namespace Jovemnf.WebAPI
             }
         }
 
-        public async void Send()
+        public async Task Send()
         {
             try
             {
