@@ -3,9 +3,11 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>Jovemnf.WebAPI</PackageId>
-    <Version>0.0.5</Version>
+    <Version>0.0.6</Version>
     <Authors>Jovemnf</Authors>
     <Company>Jovemnf</Company>
+    <AssemblyOriginatorKeyFile>sgKey.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>True</SignAssembly>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Title>Pacote .net core para usar os verbos HTTP. </Title>
     <RepositoryType>git</RepositoryType>
@@ -14,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
 </Project>
