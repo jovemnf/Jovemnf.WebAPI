@@ -1,206 +1,147 @@
-# Jovemnf.WebAPI
+# Jovemnf.WebAPI 💎
 
-Pacode .net core para usar os verbos HTTP.
+[![.NET 9](https://img.shields.io/badge/.NET-9.0-blueviolet.svg)](https://dotnet.microsoft.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Modo de Usar
+Uma biblioteca .NET moderna, elegante e de alta performance para consumo de APIs HTTP. Inspirada na simplicidade do **Axios**, mas construída com o poder e a tipagem do **.NET 9**.
 
-### GET
+## ✨ Destaques
 
-Para fazer um Get Simples segue o exemplo abaixo
+- 🚀 **Arquitetura Facade**: Interface simplificada que esconde uma engenharia robusta.
+- 🏗️ **Padrão Builder**: Construção de requisições modular e segura.
+- 🛡️ **Tipagem Forte**: Suporte total a Generics e Nullable Reference Types.
+- 🧩 **Zero Config**: Funciona "out of the box", mas é totalmente extensível.
+- 🚦 **HttpClient Optimized**: Gerenciamento inteligente de instâncias do HttpClient.
 
+---
+
+## 🚀 Como Usar: API Estática (Estilo Axios)
+
+A forma mais rápida e moderna de consumir APIs. Sem instanciamento, sem complicações.
+
+### GET Simples
 ```csharp
-using System;
-using Jovemnf.WebAPI;
-
-namespace TesteWebAPI
-{
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            Exec();
-            Console.Read();
-        }
-
-        private static async void Exec() {
-            string url = "https://jsonplaceholder.typicode.com/posts/1";
-            using (WebAPI web = new WebAPI(url, 5000, WebAPI.MethodRequest.GET))
-            {
-                try {
-                    var post = await web.SendAndGet<Post>();
-                    Console.WriteLine("ID: " + post.id);
-                    Console.WriteLine("USER-ID: " + post.userId);
-                    Console.WriteLine("TITLE: " + post.title);
-                    Console.WriteLine("BODY: " + post.body);
-                } catch (Exception e) {
-                    Console.WriteLine(e);
-                }
-            }
-        }
-    }
-
-    class Post {
-        public int userId { get; set; }
-        public int id { get; set; }
-        public string title { get; set; }
-        public string body { get; set; }
-    }
-}
-
+var post = await WebAPI.Get<Post>("https://api.example.com/posts/1");
+Console.WriteLine(post.Title);
 ```
 
-### GET LIST
-
-Buscando uma listagem de posts
-
+### POST com JSON
 ```csharp
-using System;
-using System.Collections.Generic;
-using Jovemnf.WebAPI;
-
-namespace TesteWebAPI
-{
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            Exec();
-            Console.Read();
-        }
-
-        private static async void Exec() {
-            string url = "https://jsonplaceholder.typicode.com/posts";
-            using (WebAPI web = new WebAPI(url, 5000, WebAPI.MethodRequest.GET))
-            {
-                try {
-                    var posts = await web.SendAndGet<List<Post>>();
-                    Console.WriteLine("COUNT: " + posts.Count);
-                } catch (Exception e) {
-                    Console.WriteLine(e);
-                }
-            }
-        }
-    }
-
-    class Post {
-        public int userId { get; set; }
-        public int id { get; set; }
-        public string title { get; set; }
-        public string body { get; set; }
-    }
-}
+var data = new { title = "Meu Post", body = "Conteúdo legal", userId = 1 };
+var result = await WebAPI.Post<Post>("https://api.example.com/posts", data);
 ```
 
-### POST
+### Outros Verbos (PUT, PATCH, DELETE)
+```csharp
+// Atualização parcial
+await WebAPI.Patch("https://api.example.com/posts/1", new { title = "Novo Título" });
 
-Utilizando a lib via POST e aguardando resultado
+// Exclusão
+await WebAPI.Delete<bool>("https://api.example.com/posts/1");
+```
+
+---
+
+## 🛠️ Modo Avançado (Fluente)
+
+Para quando você precisa de controle granular sobre headers, timeouts e instâncias.
 
 ```csharp
-using System;
-using Jovemnf.WebAPI;
+using var api = new WebAPI("https://api.example.com")
+    .WithHeaders(new Dictionary<string, string> { 
+        { "Authorization", "Bearer my-token" },
+        { "X-Custom-Header", "Value" }
+    });
 
-namespace TesteWebAPI
+api.SetJson(new { filter = "active" });
+
+// Define timeout customizado (em ms)
+var response = await api.Send<List<Data>>();
+```
+
+---
+
+## 🔐 Autenticação
+
+### Basic Auth
+```csharp
+using var api = new WebAPI("https://api.exemplo.com")
+    .WithBasicAuth("usuario", "senha");
+
+var dados = await api.Get<Modelo>();
+```
+
+### Certificados e mTLS
+Para chamadas que exigem autenticação mTLS (Certificado Digital), você pode usar o método fluente `.WithCertificate()`.
+
+```csharp
+using var cert = new X509Certificate2("path/to/certificate.pfx", "password");
+
+using var api = new WebAPI("https://api.secure.com")
+    .WithCertificate(cert);
+
+var response = await api.Get<SecureData>();
+```
+
+Você também pode injetar seu próprio `HttpClient` se desejar:
+```csharp
+using var api = new WebAPI("https://api.example.com")
+    .WithHttpClient(myCustomHttpClient);
+```
+
+---
+
+## 🛰️ Tratamento de Erros Inteligente
+
+O `Jovemnf.WebAPI` elimina a necessidade de verificar códigos de status manualmente o tempo todo. Ele mapeia automaticamente **todos** os códigos 4xx e 5xx para exceções específicas e semânticas.
+
+**Exemplos de Exceções Inclusas (> 40 tipos):**
+- `BadRequestException` (400)
+- `UnauthorizedAccessException` (401)
+- `ForbiddenException` (403)
+- `NotFoundException` (404)
+- `ConflictException` (409)
+- `UnprocessableEntityException` (422)
+- `InternalServerError` (500)
+- `BadGatewayException` (502)
+
+```csharp
+try 
 {
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            var post = new Post
-            {
-                userId = 1,
-                title = "titulo 1",
-                body = "body 1"
-            };
-
-            Exec(post);
-            Console.Read();
-        }
-
-        private static async void Exec(Post post) {
-            string url = "https://jsonplaceholder.typicode.com/posts";
-            using (WebAPI web = new WebAPI(url, 5000, WebAPI.MethodRequest.POST))
-            {
-                try {
-                    web.SetJson(post);
-
-                    var returned = await web.Send<Post>();
-                    Console.WriteLine("ID: " + returned.id);
-                    Console.WriteLine("USER-ID: " + returned.userId);
-                    Console.WriteLine("TITLE: " + returned.title);
-                    Console.WriteLine("BODY: " + returned.body);
-                } catch (Exception e) {
-                    Console.WriteLine(e);
-                }
-            }
-        }
-    }
-
-    class Post {
-        public int userId { get; set; }
-        public int id { get; set; }
-        public string title { get; set; }
-        public string body { get; set; }
-    }
+    var user = await WebAPI.Get<User>(url);
+}
+catch (NotFoundException)
+{
+    // Lógica para usuário não encontrado
+}
+catch (UnauthorizedAccessException) 
+{
+    // Lógica para erro de login
 }
 ```
 
-Utilizando a lib via POST sem nenhum resultado
+---
 
-```csharp
-using System;
-using Jovemnf.WebAPI;
+## 📦 Instalação e Requisitos
 
-namespace TesteWebAPI
-{
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            var post = new Post
-            {
-                userId = 1,
-                title = "titulo 1",
-                body = "body 1"
-            };
+- **Runtime**: .NET 9.0+
+- **Dependências**: 
+  - `Newtonsoft.Json`: Para alta flexibilidade na serialização.
 
-            Exec(post);
-            Console.Read();
-        }
-
-        private static async void Exec(Post post) {
-            string url = "https://jsonplaceholder.typicode.com/posts";
-            using (WebAPI web = new WebAPI(url, 5000, WebAPI.MethodRequest.POST))
-            {
-                try {
-                    web.SetJson(post);
-                    await web.Send();
-                } catch (Exception e) {
-                    Console.WriteLine(e);
-                }
-            }
-        }
-    }
-
-    class Post {
-        public int userId { get; set; }
-        public int id { get; set; }
-        public string title { get; set; }
-        public string body { get; set; }
-    }
-}
+```bash
+dotnet add package Jovemnf.WebAPI
 ```
 
-## Using header
+---
 
-```csharp
-string url = "https://jsonplaceholder.typicode.com/posts";
-using (WebAPI web = new WebAPI(url, 5000, WebAPI.MethodRequest.POST))
-{
-    try {
-        web.SetHeader("Bearer", "JWT 563563563563563563564564");
-        web.SetJson(post);
-    } catch (Exception e) {
-        Console.WriteLine(e);
-    }
-}
-```
+## 🏛️ Design Patterns Aplicados
+
+Esta biblioteca foi refatorada seguindo princípios **SOLID** e padrões de projeto para garantir manutenibilidade:
+- **Facade Pattern**: Classe principal `WebAPI`.
+- **Builder Pattern**: Internamente via `WebRequestBuilder`.
+- **Strategy Pattern**: Validação de respostas e lançamento de exceções.
+- **Engine Pattern**: Processamento centralizado via `WebAPIEngine`.
+
+---
+
+© 2026 Wallace Silva - Desenvolvido com ❤️ e foco em qualidade.

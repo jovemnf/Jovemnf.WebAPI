@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Jovemnf.WebAPI/Jovemnf.WebAPI.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Jovemnf.WebAPI.Tests/Jovemnf.WebAPI.Tests.csproj" />
+  </Folder>
+</Solution>
