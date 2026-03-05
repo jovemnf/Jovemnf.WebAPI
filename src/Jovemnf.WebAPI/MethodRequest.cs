@@ -1,7 +1,6 @@
-namespace Jovemnf.WebAPI
+namespace Jovemnf.WebApi;
+
+public enum MethodRequest
 {
-    public enum MethodRequest
-    {
-        POST, GET, DELETE, PUT, PATCH
-    }
+    POST, GET, DELETE, PUT, PATCH
 }

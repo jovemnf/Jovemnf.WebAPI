@@ -1,15 +1,11 @@
-using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Net.Http;
 using System.Threading;
-using System.Threading.Tasks;
-using Xunit;
+using Jovemnf.WebApi;
 using Jovemnf.WebAPI.Exceptions;
 
 namespace Jovemnf.WebAPI.Tests
 {
-    public class WebAPITests
+    public class WebApiTests
     {
         private class MockHttpMessageHandler : HttpMessageHandler
         {
@@ -34,13 +30,14 @@ namespace Jovemnf.WebAPI.Tests
 
         #region Instance Methods Tests
 
+        /*
         [Fact]
         public async Task SendAndGetString_ShouldReturnContent_OnSuccess()
         {
             // Arrange
             var expectedContent = "{\"status\":\"ok\"}";
             var client = CreateMockClient(req => new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(expectedContent) });
-            var api = new Jovemnf.WebAPI.WebAPI(new Uri("https://api.example.com"), client);
+            var api = new Jovemnf.WebAPI.WebApi(new Uri("https://api.example.com"), client);
 
             // Act
             var result = await api.SendAndGetString();
@@ -48,6 +45,7 @@ namespace Jovemnf.WebAPI.Tests
             // Assert
             Assert.Equal(expectedContent, result);
         }
+        */
 
         [Fact]
         public async Task SetJson_ShouldSendCorrectContent()
@@ -61,7 +59,7 @@ namespace Jovemnf.WebAPI.Tests
                 capturedContent = req.Content?.ReadAsStringAsync().GetAwaiter().GetResult();
                 return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{}") };
             });
-            var api = new Jovemnf.WebAPI.WebAPI(new Uri("https://api.example.com"), client);
+            var api = new Api(new Uri("https://api.example.com"), client);
             var data = new { Name = "Test", Value = 123 };
 
             // Act
@@ -87,7 +85,7 @@ namespace Jovemnf.WebAPI.Tests
                 capturedContent = req.Content?.ReadAsStringAsync().GetAwaiter().GetResult();
                 return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{}") };
             });
-            var api = new Jovemnf.WebAPI.WebAPI(new Uri("https://api.example.com"), client);
+            var api = new Api(new Uri("https://api.example.com"), client);
             var data = new Dictionary<string, object> { { "key", "value" } };
 
             // Act
@@ -109,7 +107,7 @@ namespace Jovemnf.WebAPI.Tests
         {
             // Arrange
             var client = CreateMockClient(req => new HttpResponseMessage(statusCode));
-            var api = new Jovemnf.WebAPI.WebAPI(new Uri("https://api.example.com"), client);
+            var api = new Api(new Uri("https://api.example.com"), client);
 
             // Act & Assert
             await Assert.ThrowsAsync(expectedExceptionType, async () => await api.Send());
@@ -121,7 +119,7 @@ namespace Jovemnf.WebAPI.Tests
             // Arrange
             HttpRequestMessage? capturedRequest = null;
             var client = CreateMockClient(req => { capturedRequest = req; return new HttpResponseMessage(HttpStatusCode.OK); });
-            var api = new Jovemnf.WebAPI.WebAPI(new Uri("https://api.example.com"), client, 10000, Jovemnf.WebAPI.WebAPI.MethodRequest.PATCH);
+            var api = new Api(new Uri("https://api.example.com"), client, 10000, MethodRequest.PATCH);
 
             // Act
             api.SetHeader("X-Test", "Value");
@@ -138,7 +136,7 @@ namespace Jovemnf.WebAPI.Tests
             // Arrange
             HttpRequestMessage? capturedRequest = null;
             var client = CreateMockClient(req => { capturedRequest = req; return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{}") }; });
-            var api = new Jovemnf.WebAPI.WebAPI("https://api.example.com")
+            var api = new Api("https://api.example.com")
                 .WithHttpClient(client);
 
             // Act
@@ -160,7 +158,7 @@ namespace Jovemnf.WebAPI.Tests
                 return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{}") }; 
             });
             
-            var api = new Jovemnf.WebAPI.WebAPI("https://api.example.com")
+            var api = new Api("https://api.example.com")
                 .WithHttpClient(client)
                 .WithBasicAuth("user", "pass");
 
@@ -184,7 +182,7 @@ namespace Jovemnf.WebAPI.Tests
                 "cn=test", rsa, System.Security.Cryptography.HashAlgorithmName.SHA256, System.Security.Cryptography.RSASignaturePadding.Pkcs1);
             using var cert = request.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddYears(1));
 
-            var api = new Jovemnf.WebAPI.WebAPI("https://api.example.com");
+            var api = new Api("https://api.example.com");
 
             // Act
             var result = api.WithCertificate(cert);
@@ -204,10 +202,10 @@ namespace Jovemnf.WebAPI.Tests
             // Arrange
             HttpRequestMessage? capturedRequest = null;
             var client = CreateMockClient(req => { capturedRequest = req; return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{}") }; });
-            Jovemnf.WebAPI.WebAPI.SetStaticClient(client);
+            Api.SetStaticClient(client);
 
             // Act
-            await Jovemnf.WebAPI.WebAPI.Get("https://api.example.com/static-get");
+            await Api.Get("https://api.example.com/static-get");
 
             // Assert
             Assert.NotNull(capturedRequest);
@@ -227,10 +225,10 @@ namespace Jovemnf.WebAPI.Tests
                 capturedContent = req.Content?.ReadAsStringAsync().GetAwaiter().GetResult();
                 return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{}") };
             });
-            Jovemnf.WebAPI.WebAPI.SetStaticClient(client);
+            Api.SetStaticClient(client);
 
             // Act
-            await Jovemnf.WebAPI.WebAPI.Post("https://api.example.com/static-post", new { Foo = "Bar" });
+            await Api.Post("https://api.example.com/static-post", new { Foo = "Bar" });
 
             // Assert
             Assert.NotNull(capturedRequest);
@@ -244,16 +242,166 @@ namespace Jovemnf.WebAPI.Tests
             // Arrange
             HttpRequestMessage? capturedRequest = null;
             var client = CreateMockClient(req => { capturedRequest = req; return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{}") }; });
-            Jovemnf.WebAPI.WebAPI.SetStaticClient(client);
+            Api.SetStaticClient(client);
 
             // Act
-            await Jovemnf.WebAPI.WebAPI.Patch<object>("https://api.example.com/patch", new { val = 1 });
+            await Api.Patch<object>("https://api.example.com/patch", new { val = 1 });
 
             // Assert
             Assert.NotNull(capturedRequest);
             Assert.Equal("PATCH", capturedRequest.Method.Method);
         }
 
+        [Fact]
+        public async Task Static_Put_ShouldSendJsonAndUseCorrectVerb()
+        {
+            // Arrange
+            HttpRequestMessage? capturedRequest = null;
+            string? capturedContent = null;
+            var client = CreateMockClient(req =>
+            {
+                capturedRequest = req;
+                capturedContent = req.Content?.ReadAsStringAsync().GetAwaiter().GetResult();
+                return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{\"id\":1}") };
+            });
+            Api.SetStaticClient(client);
+
+            // Act
+            var response = await Api.Put<FakeDto>("https://api.example.com/put", new { name = "Updated" });
+
+            // Assert
+            Assert.NotNull(capturedRequest);
+            Assert.Equal(HttpMethod.Put, capturedRequest.Method);
+            Assert.Contains("\"name\":\"Updated\"", capturedContent);
+            Assert.NotNull(response.Content);
+            Assert.Equal(1, response.Content.Id);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Static_Delete_ShouldInvokeCorrectRequestAndReturnResponse()
+        {
+            // Arrange
+            HttpRequestMessage? capturedRequest = null;
+            var client = CreateMockClient(req =>
+            {
+                capturedRequest = req;
+                return new HttpResponseMessage(HttpStatusCode.NoContent) { Content = new StringContent("") };
+            });
+            Api.SetStaticClient(client);
+
+            // Act
+            var response = await Api.Delete("https://api.example.com/delete/1");
+
+            // Assert
+            Assert.NotNull(capturedRequest);
+            Assert.Equal(HttpMethod.Delete, capturedRequest.Method);
+            Assert.Equal("https://api.example.com/delete/1", capturedRequest.RequestUri?.ToString());
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Static_Get_WithHeaders_ShouldSendHeaders()
+        {
+            // Arrange
+            HttpRequestMessage? capturedRequest = null;
+            var client = CreateMockClient(req =>
+            {
+                capturedRequest = req;
+                return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{}") };
+            });
+            Api.SetStaticClient(client);
+            var headers = new Dictionary<string, string> { { "X-Custom", "Value" }, { "Accept", "application/json" } };
+
+            // Act
+            await Api.Get("https://api.example.com/with-headers", headers);
+
+            // Assert
+            Assert.NotNull(capturedRequest);
+            Assert.True(capturedRequest.Headers.Contains("X-Custom"));
+            Assert.Equal("Value", capturedRequest.Headers.GetValues("X-Custom").FirstOrDefault());
+        }
+
+        [Fact]
+        public async Task Send_ShouldReturnWebApiResponseWithContentAndStatusCode()
+        {
+            // Arrange
+            var json = "{\"id\":42,\"name\":\"Test\"}";
+            var client = CreateMockClient(_ => new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(json) });
+            var api = new Api(new Uri("https://api.example.com"), client);
+
+            // Act
+            var response = await api.Send<FakeDto>();
+
+            // Assert
+            Assert.NotNull(response.Content);
+            Assert.Equal(42, response.Content.Id);
+            Assert.Equal("Test", response.Content.Name);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Null(response.Exception);
+        }
+
+        [Fact]
+        public async Task Send_GetString_ShouldReturnStringContent()
+        {
+            // Arrange
+            var raw = "plain text";
+            var client = CreateMockClient(_ => new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(raw) });
+            var api = new Api(new Uri("https://api.example.com"), client);
+
+            // Act
+            var response = await api.Send<string>();
+
+            // Assert
+            Assert.Equal(raw, response.Content);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Timeout_ShouldReturnWebApiResponseWithException()
+        {
+            // Arrange: handler que demora mais que o timeout (3s) para disparar cancelamento (timeout 1s)
+            var client = CreateMockClient(_ =>
+            {
+                Thread.Sleep(3000);
+                return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{}") };
+            });
+            var shortTimeoutApi = new Api(new Uri("https://api.example.com"), client, 1000, MethodRequest.GET);
+
+            // Act
+            var response = await shortTimeoutApi.Send<object>();
+
+            // Assert
+            Assert.NotNull(response.Exception);
+            Assert.IsType<TimeoutException>(response.Exception);
+            Assert.Equal(HttpStatusCode.RequestTimeout, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task WithHeaders_ShouldApplyAllHeaders()
+        {
+            // Arrange
+            HttpRequestMessage? capturedRequest = null;
+            var client = CreateMockClient(req => { capturedRequest = req; return new HttpResponseMessage(HttpStatusCode.OK); });
+            var api = new Api(new Uri("https://api.example.com"), client);
+            var headers = new Dictionary<string, string> { { "A", "1" }, { "B", "2" } };
+
+            // Act
+            api.WithHeaders(headers);
+            await api.Send();
+
+            // Assert
+            Assert.NotNull(capturedRequest);
+            Assert.True(capturedRequest.Headers.Contains("A"));
+            Assert.True(capturedRequest.Headers.Contains("B"));
+        }
+
         #endregion
+    }
+
+    internal class FakeDto
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
     }
 }

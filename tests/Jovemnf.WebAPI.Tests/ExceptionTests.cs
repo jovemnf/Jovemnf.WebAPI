@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using System.Net.Http;
+using Jovemnf.WebApi;
 using Xunit;
 using Jovemnf.WebAPI.Exceptions;
 
@@ -52,10 +53,41 @@ namespace Jovemnf.WebAPI.Tests
             var response = new HttpResponseMessage(statusCode);
 
             // Act
-            var exception = Jovemnf.WebAPI.WebAPI.CheckException(response);
+            var exception = Api.CheckException(response);
 
             // Assert
             Assert.IsType(expectedType, exception);
+        }
+
+        [Fact]
+        public void CheckException_WebException_Timeout_ShouldReturnTimeoutException()
+        {
+            var webEx = new WebException("Timeout", null, WebExceptionStatus.Timeout, null);
+
+            var result = Api.CheckException(webEx);
+
+            Assert.IsType<TimeoutException>(result);
+        }
+
+        [Fact]
+        public void CheckException_WebException_ProxyProhibited_ShouldReturnProxyProhibited()
+        {
+            var webEx = new WebException("Proxy", null, WebExceptionStatus.RequestProhibitedByProxy, null);
+
+            var result = Api.CheckException(webEx);
+
+            Assert.IsType<ProxyProhibited>(result);
+        }
+
+        [Fact]
+        public void CheckException_HttpResponseMessage_Unauthorized_ShouldIncludeMessage()
+        {
+            var msg = "Invalid token";
+            var response = new HttpResponseMessage(HttpStatusCode.Unauthorized) { ReasonPhrase = msg };
+            var exception = Api.CheckException(response) as UnauthorizedAccessException;
+
+            Assert.NotNull(exception);
+            Assert.Equal(msg, exception.Message);
         }
     }
 }

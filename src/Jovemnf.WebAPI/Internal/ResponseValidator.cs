@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Http;
 using Jovemnf.WebAPI.Exceptions;
 
-namespace Jovemnf.WebAPI.Internal
+namespace Jovemnf.WebApi.Internal
 {
     internal static class ResponseValidator
     {
